@@ -135,8 +135,6 @@ var/list/admin_verbs_fun = list(
 var/list/admin_verbs_spawn = list(
 	/datum/admins/proc/spawn_fruit,
 	/datum/admins/proc/spawn_fluid_verb,
-	/datum/admins/proc/spawn_custom_item,
-	/datum/admins/proc/check_custom_items,
 	/datum/admins/proc/spawn_plant,
 	/datum/admins/proc/spawn_atom,		// allows us to spawn instances,
 	/datum/admins/proc/spawn_artifact,
@@ -938,8 +936,9 @@ var/list/admin_verbs_mentors = list(
 
 	if(!check_rights(R_FUN)) return
 
-	var/datum/spell/S = input("Choose the spell to give to that guy", "ABRAKADABRA") as null|anything in spells
-	if(!S) return
+	var/datum/spell/S = input("Choose the spell to give to that guy", "ABRAKADABRA") as null|anything in GLOB.spells_by_categories
+	if(!S)
+		return
 	T.add_spell(new S)
 	SSstatistics.add_field_details("admin_verb","GS") //If you are copy-pasting this, ensure the 2nd parameter is unique to the new proc!
 	log_and_message_staff("gave [key_name(T)] the spell [S].")

@@ -7,7 +7,6 @@ var/global/list/image/ghost_sightless_images = list() //this is a list of images
 	icon = 'icons/mob/mob.dmi'
 	icon_state = "ghost"
 	appearance_flags = KEEP_TOGETHER | LONG_GLIDE
-	blinded = 0
 	anchored = TRUE	//  don't get pushed around
 	universal_speak = TRUE
 
@@ -199,6 +198,7 @@ This is the proc mobs get to turn into a ghost. Forked from ghostize due to comp
 	mind.current.teleop = null
 	mind.current.reload_fullscreen()
 	mind.current.client.init_verbs()
+	SEND_SIGNAL(mind, COMSIG_MIND_POST_INIT)
 	if(!admin_ghosted)
 		announce_ghost_joinleave(mind, 0, "They now occupy their body again.")
 	return 1
@@ -253,7 +253,7 @@ This is the proc mobs get to turn into a ghost. Forked from ghostize due to comp
 		to_chat(src, "No area available.")
 		return
 
-	var/list/area_turfs = get_area_turfs(thearea, shall_check_if_holy() ? list(/proc/is_not_holy_turf) : list())
+	var/list/area_turfs = get_area_turfs(thearea, shall_check_if_holy() ? list(GLOBAL_PROC_REF(is_not_holy_turf)) : list())
 	if(!area_turfs.len)
 		to_chat(src, SPAN_WARNING("This area has been entirely made into sacred grounds, you cannot enter it while you are in this plane of existence!"))
 		return
@@ -639,7 +639,7 @@ This is the proc mobs get to turn into a ghost. Forked from ghostize due to comp
 		return FALSE
 	if(world.time < PSCP.min_time)
 		return FALSE
-	if(LAZYLEN(GLOB.clients) < PSCP.min_playercount)
+	if(!PSCP.has_minimum_players())
 		return FALSE
 	if(PossibleSCP.client)
 		return FALSE
